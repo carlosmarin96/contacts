@@ -15,6 +15,10 @@ class Contacts(db.Model):
     phone = db.Column(db.String(10),nullable=True)
     email = db.Column(db.String(100),nullable=False)
 
+def hasNumber(inputString):
+    return any(char.isdigit() for char in inputString)
+
+
 @app.route('/')
 def index():
     data = Contacts.query.all()
@@ -28,6 +32,27 @@ def add_contact():
     company = request.form['company']
     phone = request.form['phone']
     email = request.form['email']
+
+    if name=="" or lastname=="" or email=="":
+        flash ("Complete required inputs")
+        return redirect(url_for('index'))
+
+    if ' ' in name or ' ' in lastname or hasNumber(name) or hasNumber(lastname):
+        flash ("Invalid format in name or lastname")
+        return redirect(url_for('index'))
+
+    phone_email_validate = Contacts.query.all()
+
+    for email_phone in phone_email_validate:
+        if email == email_phone.email:
+            flash ("Email should be unique")
+            return redirect(url_for('index'))
+        if phone:
+            if phone == email_phone.phone:
+                flash ("Phone should be unique")
+                return redirect(url_for('index'))
+
+        
 
     new_contact = Contacts(name=name, lastname=lastname, company=company, phone=phone, email=email)
     db.session.add(new_contact)
