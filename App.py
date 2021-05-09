@@ -21,7 +21,8 @@ def hasNumber(inputString):
 
 @app.route('/')
 def index():
-    data = Contacts.query.all()
+    page = request.args.get('page', 1, type=int)
+    data = Contacts.query.paginate(page=page, per_page=10)
     return render_template('index.html', contacts=data)
     
 
